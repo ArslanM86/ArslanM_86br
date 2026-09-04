@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: arslanm-86br
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    numInstances: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: STORAGE_DIR
+        value: /var/data
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+    disk:
+      name: arslanm-86br-data
+      mountPath: /var/data
+      sizeGB: 1
