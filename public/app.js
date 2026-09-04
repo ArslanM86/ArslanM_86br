@@ -18,7 +18,7 @@ const grid = document.getElementById("grid");
 const empty = document.getElementById("empty");
 const filters = document.getElementById("filters");
 const search = document.getElementById("search");
-const addModal = document.getElementById("addModal");
+const modal = document.getElementById("modal");
 const loginModal = document.getElementById("loginModal");
 const addBtn = document.getElementById("addBtn");
 const adminBtn = document.getElementById("adminBtn");
@@ -78,19 +78,17 @@ function renderFilters() {
         data-filter="${type}"
       >
         ${labels[type]}
-        <span class="filter-count">${c[type]}</span>
+        <span class="count">${c[type]}</span>
       </button>
     `)
     .join("");
 
-  filters
-    .querySelectorAll("[data-filter]")
-    .forEach(button => {
-      button.onclick = () => {
-        state.filter = button.dataset.filter;
-        render();
-      };
-    });
+  filters.querySelectorAll("[data-filter]").forEach(button => {
+    button.onclick = () => {
+      state.filter = button.dataset.filter;
+      render();
+    };
+  });
 }
 
 function render() {
@@ -100,13 +98,14 @@ function render() {
 
   const visible = state.items.filter(item => {
     const filterOk =
-      state.filter === "all" || item.type === state.filter;
+      state.filter === "all" ||
+      item.type === state.filter;
 
-    const text =
-      `${item.title || ""} ${item.genre || ""}`
-        .toLocaleLowerCase("fa");
+    const text = `${item.title || ""} ${item.genre || ""}`
+      .toLocaleLowerCase("fa");
 
-    const searchOk = !q || text.includes(q);
+    const searchOk =
+      !q || text.includes(q);
 
     return filterOk && searchOk;
   });
@@ -115,50 +114,47 @@ function render() {
     .map(item => `
       <article class="card">
 
-        ${state.admin ? `
-          <button
-            class="delete"
-            title="حذف"
-            data-delete="${item.id}"
-            style="
-              position:absolute;
-              top:8px;
-              right:8px;
-              z-index:5;
-              width:32px;
-              height:32px;
-              border:1px solid #3a2020;
-              border-radius:9px;
-              background:rgba(20,10,10,.9);
-              color:#ff8d8d;
-              font-size:20px;
-              line-height:1;
-            "
-          >×</button>
-        ` : ""}
+        ${
+          state.admin
+            ? `
+              <button
+                class="delete"
+                title="حذف"
+                data-delete="${item.id}"
+              >
+                ×
+              </button>
+            `
+            : ""
+        }
 
-        <div class="card-poster">
-          ${
-            item.image
-              ? `<img
-                  src="${escapeHtml(item.image)}"
-                  alt="${escapeHtml(item.title)}"
-                  loading="lazy"
-                >`
-              : `<div class="no-poster">▧</div>`
-          }
-        </div>
+        ${
+          item.image
+            ? `
+              <img
+                class="poster"
+                src="${escapeHtml(item.image)}"
+                alt="${escapeHtml(item.title)}"
+                loading="lazy"
+              >
+            `
+            : `
+              <div class="no-poster">▧</div>
+            `
+        }
 
-        <div class="card-info">
-          <div class="card-title">
+        <div class="card-body">
+          <div class="title">
             ${escapeHtml(item.title)}
           </div>
 
           ${
             item.genre
-              ? `<div class="card-genre">
+              ? `
+                <div class="genre">
                   ${escapeHtml(item.genre)}
-                </div>`
+                </div>
+              `
               : ""
           }
         </div>
@@ -167,62 +163,70 @@ function render() {
     `)
     .join("");
 
-  empty.classList.toggle("show", visible.length === 0);
-  grid.style.display = visible.length === 0 ? "none" : "grid";
+  empty.classList.toggle(
+    "hidden",
+    visible.length !== 0
+  );
 
-  grid
-    .querySelectorAll("[data-delete]")
-    .forEach(button => {
-      button.onclick = async () => {
-        if (!confirm("این اثر حذف شود؟")) {
-          return;
-        }
+  grid.classList.toggle(
+    "hidden",
+    visible.length === 0
+  );
 
-        try {
-          await api(`/api/items/${button.dataset.delete}`, {
+  grid.querySelectorAll("[data-delete]").forEach(button => {
+    button.onclick = async () => {
+      if (!confirm("این اثر حذف شود؟")) {
+        return;
+      }
+
+      try {
+        await api(
+          `/api/items/${button.dataset.delete}`,
+          {
             method: "DELETE"
-          });
+          }
+        );
 
-          await load();
-        } catch (err) {
-          alert(err.message);
-        }
-      };
-    });
+        await load();
+
+      } catch (err) {
+        alert(err.message);
+      }
+    };
+  });
 }
 
 function updateAdminUI() {
   adminBtn.textContent = state.admin
     ? "مدیر وارد است"
-    : "مدیریت";
+    : "ورود مدیر";
 
-  addBtn.style.display = state.admin
-    ? "inline-block"
-    : "none";
+  addBtn.classList.toggle(
+    "hidden",
+    !state.admin
+  );
 }
 
 function escapeHtml(value) {
-  return String(value ?? "").replace(
-    /[&<>"']/g,
-    char => ({
+  return String(value ?? "")
+    .replace(/[&<>"']/g, char => ({
       "&": "&amp;",
       "<": "&lt;",
       ">": "&gt;",
       '"': "&quot;",
       "'": "&#039;"
-    }[char])
-  );
+    }[char]));
 }
 
-function openModal(modal) {
-  if (modal) {
-    modal.classList.add("show");
+function openModal(target) {
+  if (target) {
+    target.classList.remove("hidden");
   }
 }
 
-function closeModal(modal) {
-  if (modal) {
-    modal.classList.remove("show");
+function closeModal(target) {
+  if (target) {
+    target.classList.add("hidden");
   }
 }
 
@@ -247,30 +251,33 @@ async function logout() {
     });
 
     state.admin = false;
+
     render();
     updateAdminUI();
+
   } catch (err) {
     alert(err.message);
   }
-}
-
-addBtn.onclick = () => {
-  openModal(addModal);
 };
 
-document.querySelectorAll(".close-btn").forEach(button => {
-  button.addEventListener("click", () => {
-    const modal = button.closest(".modal");
-    closeModal(modal);
-  });
-});
+addBtn.onclick = () => {
+  openModal(modal);
+};
 
-[addModal, loginModal].forEach(modal => {
-  if (!modal) return;
+document.getElementById("closeModal").onclick = () => {
+  closeModal(modal);
+};
 
-  modal.addEventListener("click", event => {
-    if (event.target === modal) {
-      closeModal(modal);
+document.getElementById("closeLogin").onclick = () => {
+  closeModal(loginModal);
+};
+
+[modal, loginModal].forEach(target => {
+  if (!target) return;
+
+  target.addEventListener("click", event => {
+    if (event.target === target) {
+      closeModal(target);
     }
   });
 });
@@ -278,8 +285,8 @@ document.querySelectorAll(".close-btn").forEach(button => {
 document.getElementById("loginForm").onsubmit = async event => {
   event.preventDefault();
 
-  const password = document.getElementById("password");
   const msg = document.getElementById("loginMsg");
+  const password = document.getElementById("password");
 
   try {
     await api("/api/login", {
@@ -298,6 +305,7 @@ document.getElementById("loginForm").onsubmit = async event => {
     closeModal(loginModal);
 
     await load();
+
   } catch (err) {
     msg.textContent = err.message;
   }
@@ -318,9 +326,10 @@ document.getElementById("itemForm").onsubmit = async event => {
     event.target.reset();
     msg.textContent = "";
 
-    closeModal(addModal);
+    closeModal(modal);
 
     await load();
+
   } catch (err) {
     msg.textContent = err.message;
   }
@@ -332,7 +341,9 @@ themeBtn.onclick = () => {
   const light =
     document.body.classList.contains("light");
 
-  themeBtn.textContent = light ? "☀" : "☾";
+  themeBtn.textContent = light
+    ? "☀"
+    : "☾";
 
   localStorage.setItem(
     "theme",
@@ -356,7 +367,7 @@ loadTheme();
 load().catch(err => {
   console.error(err);
 
-  empty.classList.add("show");
+  empty.classList.remove("hidden");
 
   const title = empty.querySelector("h2");
   const text = empty.querySelector("p");
