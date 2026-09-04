@@ -1,1 +1,126 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07090d">
+  <title>ArslanM_86br — کتابخانه شخصی</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="bg-glow"></div>
 
+  <header class="topbar">
+    <a class="brand" href="/">
+      <span class="brand-line"></span>
+      <span>ArslanM<span class="blue">_86br</span></span>
+    </a>
+
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input id="search" type="search" placeholder="جستجو بین فیلم‌ها، سریال‌ها، انیمه‌ها و کتاب‌ها..." autocomplete="off">
+    </div>
+
+    <div class="header-actions">
+      <button id="adminBtn" class="ghost-btn">ورود مدیر</button>
+      <button id="themeBtn" class="round-btn" title="تم">☾</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="toolbar">
+      <nav id="filters" class="filters"></nav>
+      <button id="addBtn" class="add-btn">＋ افزودن اثر جدید</button>
+    </section>
+
+    <section id="grid" class="grid"></section>
+
+    <div id="empty" class="empty hidden">
+      <div class="empty-icon">⌕</div>
+      <h2>چیزی پیدا نشد</h2>
+      <p>عنوان یا ژانر دیگری را امتحان کن.</p>
+    </div>
+  </main>
+
+  <footer>
+    <span>ArslanM_86br © 2026 · My Personal Library</span>
+
+    <div class="socials">
+      <a href="https://instagram.com/ArslanM_86br" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="3" width="18" height="18" rx="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1"/>
+        </svg>
+      </a>
+
+      <a href="https://t.me/ArslanM_86br" target="_blank" rel="noopener noreferrer" aria-label="Telegram" title="Telegram">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21.5 4.6 18.2 20c-.25 1.1-.9 1.35-1.83.84l-5.1-3.76-2.46 2.37c-.27.27-.5.5-1.02.5l.36-5.18 9.43-8.52c.41-.36-.09-.56-.64-.2L5.3 13.38.27 11.8c-1.1-.35-1.12-1.1.23-1.62L20.16 2.7c.9-.33 1.7.2 1.34 1.9Z"/>
+        </svg>
+      </a>
+    </div>
+  </footer>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <button class="close" id="closeModal">×</button>
+
+      <h2>افزودن اثر جدید</h2>
+      <p class="muted">فقط پوستر، اسم و ژانر؛ دقیقاً همان چیزی که خواستی.</p>
+
+      <form id="itemForm">
+        <label>
+          اسم اثر
+          <input name="title" required maxlength="120" placeholder="مثلاً Interstellar">
+        </label>
+
+        <label>
+          دسته‌بندی
+          <select name="type" required>
+            <option value="movie">فیلم</option>
+            <option value="series">سریال</option>
+            <option value="anime">انیمه</option>
+            <option value="animation">انیمیشن</option>
+            <option value="book">کتاب</option>
+          </select>
+        </label>
+
+        <label>
+          ژانر
+          <input name="genre" maxlength="120" placeholder="مثلاً Sci-Fi · Drama">
+        </label>
+
+        <label>
+          پوستر / جلد
+          <input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+        </label>
+
+        <button class="primary" type="submit">ذخیره در کتابخانه</button>
+        <p id="formMsg" class="form-msg"></p>
+      </form>
+    </div>
+  </div>
+
+  <div id="loginModal" class="modal hidden">
+    <div class="modal-card small">
+      <button class="close" id="closeLogin">×</button>
+
+      <h2>ورود مدیر</h2>
+      <p class="muted">برای افزودن یا حذف آثار، رمز مدیریت را وارد کن.</p>
+
+      <form id="loginForm">
+        <label>
+          رمز عبور
+          <input id="password" type="password" required>
+        </label>
+
+        <button class="primary" type="submit">ورود</button>
+        <p id="loginMsg" class="form-msg"></p>
+      </form>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
